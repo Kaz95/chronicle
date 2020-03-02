@@ -1,0 +1,8 @@
+<div>
+    <h1>{{ strain.name }}</h1>
+    <a href="{{ url_for('some_strain', strain_name=strain.index) }}">{{ strain.name }}</a>
+    <ul>
+        <li>{{ strain.index }}</li>
+        <li>{{ strain.species }}</li>
+    </ul>
+</div>

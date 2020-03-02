@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Strains</h1>
+    {% if strains_list %}
+        {% for strain in strains_list %}
+            {% include '_strain_tile.html' %}
+        {% endfor %}
+    {% else %}
+        <h1>You Don't Seem to Have Tried Any Strains!</h1>
+    {% endif %}
+    {% if prev_url %}
+        <a href="{{ prev_url }}">Prev</a>
+    {% endif %}
+    {% if next_url %}
+        <a href="{{ next_url }}">Next</a>
+    {% endif %}
+{% endblock %}

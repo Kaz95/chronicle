@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if strain in current_user.tried %}
+        <h1>{{ strain.name }} - (Tried)</h1>
+    {% else %}
+        <h1>{{ strain.name }}</h1>
+    {% endif %}
+    <ul>
+        <li>{{ strain.id }}</li>
+        <li>{{ strain.index }}</li>
+        <li>{{ strain.leafly }}</li>
+        <li>{{ strain.species }}</li>
+        <li>{{ strain.description }}</li>
+    </ul>
+    <hr>
+    {% if current_user.has_tried(strain) %}
+    <a href="{{ url_for('untry_strain', strain_name=strain.name) }}">Un-Try</a>
+    {% else %}
+    <a href="{{ url_for('try_strain', strain_name=strain.name) }}">Try</a>
+    {% endif %}
+{% endblock %}

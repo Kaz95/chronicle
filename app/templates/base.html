@@ -7,8 +7,38 @@
     {% else %}
     <title>Welcome to Chronicle</title>
     {% endif %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.0/typeahead.bundle.js"></script>
+    <script defer src="{{ url_for('static', filename='search.js') }}"></script>
 </head>
 <body>
+    <div>
+        Chronicle:
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('strains_list') }}">Strains</a>
+        {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <a href="{{ url_for('tried_strains') }}">Tried</a>
+            <a href="{{ url_for('not_tried_strains') }}">Not Tried</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+        {% if search_list %}
+            <label for="my_search">Search Strains:</label>
+            <input type="text" id="my_search" name="search" autocomplete="off" />
+        {% endif %}
+
+    </div>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
 </body>
 </html>
