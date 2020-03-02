@@ -7,7 +7,10 @@ var colors_suggestions = new Bloodhound({
     url: 'http://127.0.0.1:5000/remote/%QUERY',
     wildcard: '%QUERY'
   },
-
+  // remote: {
+  //   url: 'http://127.0.0.1:5000/test?query=%QUERY',
+  //   wildcard: '%QUERY'
+  // },
 
   // local: ['Red','Blood Red','White','Blue','Yellow','Green','Black','Pink','Orange', 'Super og kush', 'og kush', 'Purple og kush']
   // local: [{'value': 'Red'},
@@ -38,7 +41,7 @@ $('#my_search').typeahead({
     header: '<div>Found Records:</div>',/* Rendered at the top of the dataset when
                                            suggestions are present */
     suggestion:  function(data) {       /* Used to render a single suggestion */
-                    return '<div>'+ data +'</div>'
+                    return '<div><a href="/name_to_index?name=' + data + '">'+ data +'</a></div>'
                  },
     footer: '<div>Footer Content</div>',/* Rendered at the bottom of the dataset
                                            when suggestions are present. */

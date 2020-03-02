@@ -11,7 +11,7 @@ from werkzeug.urls import url_parse
 @app.route('/home')
 @login_required
 def home():
-    return render_template('home.html', title='Home', search_list=True)
+    return render_template('home.html', title='Home')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -146,3 +146,27 @@ def remote(query):
         return flask.jsonify(results)
 
 
+# @app.route('/test')
+# def test():
+#     query = request.args.get('query')
+#     q = db.session.query(Strain.name).filter(Strain.name.like(query + '%'))
+#     count = q.count()
+#     if count >= app.config['SEARCH_RESULTS']:
+#         return flask.jsonify([i for i, in q.limit(app.config['SEARCH_RESULTS']).all()])
+#     else:
+#         first_query = [i for i, in q.all()]
+#         q2 = db.session.query(Strain.name).filter(Strain.name.like('%' + query + '%'))
+#         results = q.all() + q2.limit(app.config['SEARCH_RESULTS'] - count).all()
+        # results = first_query + [i for i, in q2.limit(app.config['SEARCH_RESULTS'] - count).all() if
+        #                          i not in first_query]
+        #
+        # print(results)
+        # return flask.jsonify(results)
+
+
+@app.route('/name_to_index')
+def name_to_index():
+    strain_name = request.args.get("name")
+    strain_index = db.session.query(Strain.index).filter(Strain.name == strain_name).first_or_404()
+    print(strain_index)
+    return redirect(url_for('some_strain', strain_name=strain_index[0]))
