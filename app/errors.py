@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app
+from app import app, db
 # 'error' or literally any param is needed for error handlers to work correctly.
 
 
@@ -10,4 +10,5 @@ def not_found_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
+    db.session.rollback()
     return render_template('500.html'), 500

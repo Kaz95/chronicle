@@ -69,6 +69,7 @@ def strains_list():
     return render_template('strains_list.html', title='Strains', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
 
 
+# TODO: Change to query string
 @app.route('/strains/tried')
 @login_required
 def tried_strains():
@@ -80,6 +81,7 @@ def tried_strains():
     return render_template('strains_list.html', title='Tried', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
 
 
+# TODO: Change to query string
 @app.route('/strains/not_tried')
 @login_required
 def not_tried_strains():
@@ -90,6 +92,7 @@ def not_tried_strains():
     return render_template('strains_list.html', title='Not Tried', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
 
 
+# TODO: Change to query string
 @app.route('/search/<strain>')
 @login_required
 def searched_strains(strain):
@@ -107,6 +110,7 @@ def some_strain(strain_name):
     return render_template('strain.html', title=strain.name, strain=strain)
 
 
+# TODO: Combine try and untry via query string, maybe even combine both into a query string on some_strain
 @app.route('/try/<strain_name>')
 @login_required
 def try_strain(strain_name):
@@ -121,6 +125,7 @@ def try_strain(strain_name):
     return redirect(url_for('some_strain', strain_name=strain.index))
 
 
+# TODO: Combine try and untry via query string
 @app.route('/untry/<strain_name>')
 @login_required
 def untry_strain(strain_name):
@@ -140,6 +145,7 @@ def untry_strain(strain_name):
 #     return flask.jsonify([i for i, in db.session.query(Strain.name).filter(Strain.name.like('%' + query + '%')).limit(5)])
 
 
+# TODO: Change to query string
 @app.route('/remote/<query>')
 def remote(query):
     print(query)
