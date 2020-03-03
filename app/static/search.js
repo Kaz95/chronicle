@@ -43,7 +43,8 @@ $('#my_search').typeahead({
     suggestion:  function(data) {       /* Used to render a single suggestion */
                     return '<div><a href="/name_to_index?name=' + data + '">'+ data +'</a></div>'
                  },
-    footer: '<div>Footer Content</div>',/* Rendered at the bottom of the dataset
-                                           when suggestions are present. */
+    footer: function (query) {
+              return '<div><a href="/search/'  + query.query + '">Search: ' + query.query + '</a></div>'
+    }
 }
 });

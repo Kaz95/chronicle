@@ -90,6 +90,16 @@ def not_tried_strains():
     return render_template('strains_list.html', title='Not Tried', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
 
 
+@app.route('/search/<strain>')
+@login_required
+def searched_strains(strain):
+    page = request.args.get('page', 1, type=int)
+    strains = Strain.query.filter(Strain.name.like('%' + strain + '%')).paginate(page, app.config['STRAINS_PER_PAGE'], False)
+    next_url = url_for('searched_strains', strain=strain, page=strains.next_num) if strains.has_next else None
+    prev_url = url_for('searched_strains', strain=strain,  page=strains.prev_num) if strains.has_prev else None
+    return render_template('strains_list.html', title='Search:' + strain, strains_list=strains.items, next_url=next_url, prev_url=prev_url)
+
+
 @app.route('/strains/<strain_name>')
 @login_required
 def some_strain(strain_name):
@@ -132,6 +142,7 @@ def untry_strain(strain_name):
 
 @app.route('/remote/<query>')
 def remote(query):
+    print(query)
     q = db.session.query(Strain.name).filter(Strain.name.like(query + '%'))
     count = q.count()
     if count >= app.config['SEARCH_RESULTS']:
