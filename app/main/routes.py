@@ -61,41 +61,29 @@ def strains_list():
 #     return render_template('strains_list.html', title='Search:' + strain, strains_list=strains.items, next_url=next_url, prev_url=prev_url)
 
 
-@bp.route('/strains/<strain_name>')
+@bp.route('/strains/<strain_index>')
 @login_required
-def some_strain(strain_name):
-    strain = Strain.query.filter_by(index=strain_name).first_or_404()
-    return render_template('strain.html', title=strain.name, strain=strain)
-
-
-# TODO: Combine try and untry via query string, maybe even combine both into a query string on some_strain
-@bp.route('/try/<strain_name>')
-@login_required
-def try_strain(strain_name):
-    strain = Strain.query.filter_by(name=strain_name).first()
+def some_strain(strain_index):
+    strain = Strain.query.filter_by(index=strain_index).first_or_404()
+    action = request.args.get('action')
     if strain is None:
-        flash(f'Strain: {strain_name} not found')
+        flash(f'Strain: {strain.name} not found')
         return redirect(url_for('main.home'))
+    if action:
+        if action == 'try':
+            current_user.try_strain(strain)
+            flash(f'Strain: {strain.name} has been tried')
+        if action == 'untry':
+            current_user.untry_strain(strain)
+            flash(f'Strain: {strain.name} has been un...tried')
+        db.session.commit()
+        return redirect(url_for('main.some_strain', strain_index=strain_index))
+    else:
+        strain = Strain.query.filter_by(index=strain_index).first_or_404()
+        return render_template('strain.html', title=strain.name, strain=strain)
 
-    current_user.try_strain(strain)
-    db.session.commit()
-    flash(f'Strain: {strain_name} has been tried')
-    return redirect(url_for('main.some_strain', strain_name=strain.index))
 
 
-# TODO: Combine try and untry via query string
-@bp.route('/untry/<strain_name>')
-@login_required
-def untry_strain(strain_name):
-    strain = Strain.query.filter_by(name=strain_name).first()
-    if strain is None:
-        flash(f'Strain: {strain_name} not found')
-        return redirect(url_for('main.home'))
-
-    current_user.untry_strain(strain)
-    db.session.commit()
-    flash(f'Strain: {strain_name} has been tried')
-    return redirect(url_for('main.some_strain', strain_name=strain.index))
 
 
 # @app.route('/remote/<query>')

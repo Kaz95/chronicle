@@ -15,8 +15,8 @@
     </ul>
     <hr>
     {% if current_user.has_tried(strain) %}
-    <a href="{{ url_for('main.untry_strain', strain_name=strain.name) }}">Un-Try</a>
+    <a href="{{ url_for('main.some_strain', strain_index=strain.index, action='untry') }}">Un-Try</a>
     {% else %}
-    <a href="{{ url_for('main.try_strain', strain_name=strain.name) }}">Try</a>
+    <a href="{{ url_for('main.some_strain', strain_index=strain.index, action='try') }}">Try</a>
     {% endif %}
 {% endblock %}
