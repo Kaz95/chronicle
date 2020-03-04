@@ -4,7 +4,7 @@ var colors_suggestions = new Bloodhound({
   // prefetch: 'http://127.0.0.1:5000/colors',
   // remote: 'http://127.0.0.1:5000/remote'
   remote: {
-    url: 'http://127.0.0.1:5000/remote/%QUERY',
+    url: 'http://127.0.0.1:5000/typeahead?q=%QUERY',
     wildcard: '%QUERY'
   },
   // remote: {

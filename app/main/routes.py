@@ -83,29 +83,18 @@ def some_strain(strain_index):
         return render_template('strain.html', title=strain.name, strain=strain)
 
 
-
-
-
-# @app.route('/remote/<query>')
-# def remote(query):
-#     return flask.jsonify([i for i, in db.session.query(Strain.name).filter(Strain.name.like('%' + query + '%')).limit(5)])
-
-
 # TODO: Change to query string
-@bp.route('/remote/<query>')
-def remote(query):
-    print(query)
-    q = db.session.query(Strain.name).filter(Strain.name.like(query + '%'))
+@bp.route('/typeahead')
+def typeahead():
+    user_query = request.args.get('q')
+    q = db.session.query(Strain.name).filter(Strain.name.like(user_query + '%'))
     count = q.count()
     if count >= current_app.config['SEARCH_RESULTS']:
         return jsonify([i for i, in q.limit(current_app.config['SEARCH_RESULTS']).all()])
     else:
         first_query = [i for i, in q.all()]
-        q2 = db.session.query(Strain.name).filter(Strain.name.like('%' + query + '%'))
-        # results = q.all() + q2.limit(app.config['SEARCH_RESULTS'] - count).all()
+        q2 = db.session.query(Strain.name).filter(Strain.name.like('%' + user_query + '%'))
         results = first_query + [i for i, in q2.limit(current_app.config['SEARCH_RESULTS'] - count).all() if i not in first_query]
-
-        print(results)
         return jsonify(results)
 
 
@@ -113,5 +102,4 @@ def remote(query):
 def name_to_index():
     strain_name = request.args.get("name")
     strain_index = db.session.query(Strain.index).filter(Strain.name == strain_name).first_or_404()
-    print(strain_index)
-    return redirect(url_for('main.some_strain', strain_name=strain_index[0]))
+    return redirect(url_for('main.some_strain', strain_index=strain_index[0]))
