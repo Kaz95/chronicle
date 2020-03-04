@@ -14,14 +14,14 @@
 <body>
     <div>
         Chronicle:
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('strains_list') }}">Strains</a>
+        <a href="{{ url_for('main.home') }}">Home</a>
+        <a href="{{ url_for('main.strains_list') }}">Strains</a>
         {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('auth.login') }}">Login</a>
         {% else %}
-            <a href="{{ url_for('tried_strains') }}">Tried</a>
-            <a href="{{ url_for('not_tried_strains') }}">Not Tried</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('main.tried_strains') }}">Tried</a>
+            <a href="{{ url_for('main.not_tried_strains') }}">Not Tried</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
             <label for="my_search">Search Strains:</label>
             <input type="text" id="my_search" name="search" autocomplete="off" />
         {% endif %}
