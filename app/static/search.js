@@ -44,7 +44,8 @@ $('#my_search').typeahead({
                     return '<div><a href="/name_to_index?name=' + data + '">'+ data +'</a></div>'
                  },
     footer: function (query) {
-              return '<div><a href="/search/'  + query.query + '">Search: ' + query.query + '</a></div>'
+              // return '<div><a href="/search/'  + query.query + '">Search: ' + query.query + '</a></div>'
+              return '<div><a href="/strains?filter=search&q='  + query.query + '">Search: ' + query.query + '</a></div>'
     }
 }
 });

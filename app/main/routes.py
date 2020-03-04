@@ -17,6 +17,7 @@ def home():
 def strains_list():
     page = request.args.get('page', 1, type=int)
     filter_ = request.args.get('filter')
+    q = request.args.get('q')
     if filter_ == 'tried':
         title = 'Tried Strains'
         strains = current_user.tried.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
@@ -29,6 +30,13 @@ def strains_list():
         strains = current_user.has_not_tried(page, current_app)
         next_url = url_for('main.strains_list', filter='not_tried',  page=strains.next_num) if strains.has_next else None
         prev_url = url_for('main.strains_list', filter='not_tried',  page=strains.prev_num) if strains.has_prev else None
+
+    elif filter_ == 'search':
+        title = 'Search: ' + q
+        strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
+
+        next_url = url_for('main.strains_list', filter=filter_, q=q, page=strains.next_num) if strains.has_next else None
+        prev_url = url_for('main.strains_list', filter=filter_, q=q, page=strains.prev_num) if strains.has_prev else None
 
     # TODO: Consider adding paginate all as a shared class method, or refactoring to be more inline with tried.paginate
     else:
@@ -43,14 +51,14 @@ def strains_list():
 
 
 # TODO: Change to query string
-@bp.route('/search/<strain>')
-@login_required
-def searched_strains(strain):
-    page = request.args.get('page', 1, type=int)
-    strains = Strain.query.filter(Strain.name.like('%' + strain + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
-    next_url = url_for('main.searched_strains', strain=strain, page=strains.next_num) if strains.has_next else None
-    prev_url = url_for('main.searched_strains', strain=strain,  page=strains.prev_num) if strains.has_prev else None
-    return render_template('strains_list.html', title='Search:' + strain, strains_list=strains.items, next_url=next_url, prev_url=prev_url)
+# @bp.route('/search/<strain>')
+# @login_required
+# def searched_strains(strain):
+#     page = request.args.get('page', 1, type=int)
+#     strains = Strain.query.filter(Strain.name.like('%' + strain + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
+#     next_url = url_for('main.searched_strains', strain=strain, page=strains.next_num) if strains.has_next else None
+#     prev_url = url_for('main.searched_strains', strain=strain,  page=strains.prev_num) if strains.has_prev else None
+#     return render_template('strains_list.html', title='Search:' + strain, strains_list=strains.items, next_url=next_url, prev_url=prev_url)
 
 
 @bp.route('/strains/<strain_name>')
