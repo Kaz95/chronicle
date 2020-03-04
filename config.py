@@ -8,6 +8,7 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     REMEMBER_COOKIE_DURATION = os.environ.get('REMEMBER_COOKIE_DURATION') or 30
     if REMEMBER_COOKIE_DURATION == 30:
         REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True

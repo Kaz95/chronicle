@@ -16,35 +16,30 @@ def home():
 @login_required
 def strains_list():
     page = request.args.get('page', 1, type=int)
+    filter_ = request.args.get('filter')
+    if filter_ == 'tried':
+        title = 'Tried Strains'
+        strains = current_user.tried.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
+        next_url = url_for('main.strains_list', filter='tried', page=strains.next_num) if strains.has_next else None
+        prev_url = url_for('main.strains_list', filter='tried',  page=strains.prev_num) if strains.has_prev else None
 
-    # strains = Strain.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
-    strains = Strain.paginate_all(page, current_app)
-    next_url = url_for('main.strains_list', page=strains.next_num) if strains.has_next else None
-    prev_url = url_for(' main.strains_list', page=strains.prev_num) if strains.has_prev else None
-    return render_template('strains_list.html', title='Strains', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
+    # TODO: Change has_not_tried to not include the paginate call, then call it here. In line with tried.paginate
+    elif filter_ == 'not_tried':
+        title = 'Not Tried Strains'
+        strains = current_user.has_not_tried(page, current_app)
+        next_url = url_for('main.strains_list', filter='not_tried',  page=strains.next_num) if strains.has_next else None
+        prev_url = url_for('main.strains_list', filter='not_tried',  page=strains.prev_num) if strains.has_prev else None
 
+    # TODO: Consider adding paginate all as a shared class method, or refactoring to be more inline with tried.paginate
+    else:
+        title = 'Strains'
+        # strains = Strain.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
+        strains = Strain.paginate_all(page, current_app)
+        next_url = url_for('main.strains_list', page=strains.next_num) if strains.has_next else None
+        prev_url = url_for('main.strains_list', page=strains.prev_num) if strains.has_prev else None
 
-# TODO: Change to query string
-@bp.route('/strains/tried')
-@login_required
-def tried_strains():
-    page = request.args.get('page', 1, type=int)
-
-    strains = current_user.tried.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
-    next_url = url_for('main.tried_strains', page=strains.next_num) if strains.has_next else None
-    prev_url = url_for('main.tried_strains', page=strains.prev_num) if strains.has_prev else None
-    return render_template('strains_list.html', title='Tried', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
-
-
-# TODO: Change to query string
-@bp.route('/strains/not_tried')
-@login_required
-def not_tried_strains():
-    page = request.args.get('page', 1, type=int)
-    strains = current_user.has_not_tried(page, current_app)
-    next_url = url_for('main.not_tried_strains', page=strains.next_num) if strains.has_next else None
-    prev_url = url_for('main.not_tried_strains', page=strains.prev_num) if strains.has_prev else None
-    return render_template('strains_list.html', title='Not Tried', strains_list=strains.items, next_url=next_url, prev_url=prev_url)
+    return render_template('strains_list.html', title=title, strains_list=strains.items, next_url=next_url,
+                           prev_url=prev_url)
 
 
 # TODO: Change to query string

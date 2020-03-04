@@ -26,10 +26,12 @@ class User(UserMixin, db.Model):
     def has_not_tried(self, page, app):
         return Strain.query.filter(~self.tried.exists()).paginate(page, app.config['STRAINS_PER_PAGE'], False)
 
+    # TODO: Silent error
     def try_strain(self, strain):
         if not self.has_tried(strain):
             self.tried.append(strain)
 
+    # TODO: Silent error
     def untry_strain(self, strain):
         if self.has_tried(strain):
             self.tried.remove(strain)
