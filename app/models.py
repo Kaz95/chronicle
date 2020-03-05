@@ -1,6 +1,7 @@
 from app import db, login
 from passlib.hash import pbkdf2_sha256 as pwd_context
 from flask_login import UserMixin
+from hashlib import md5
 
 
 @login.user_loader
@@ -57,6 +58,10 @@ class Strain(db.Model):
     @classmethod
     def paginate_all(cls, page, app):
         return Strain.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
+
+    def avatar(self, size=128):
+        digest = md5(self.name.lower().encode()).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
     def __repr__(self):
         return f'<Strain {self.name}>'

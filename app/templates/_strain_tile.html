@@ -1,8 +1,15 @@
 <div>
-    <h1>{{ strain.name }}</h1>
-    <a href="{{ url_for('main.some_strain', strain_index=strain.index) }}">{{ strain.name }}</a>
-    <ul>
-        <li>{{ strain.index }}</li>
-        <li>{{ strain.species }}</li>
-    </ul>
+    <table>
+        <tr>
+            <td><img src="{{ strain.avatar() }}" alt="Strain Identicon"></td>
+            <td><h1><a href="{{ url_for('main.some_strain', strain_index=strain.index) }}">{{ strain.name }}</a></h1></td>
+            <td>{{ strain.index }}<br>{{ strain.species }}</td>
+        </tr>
+    </table>
+{#    <h1><a href="{{ url_for('main.some_strain', strain_index=strain.index) }}">{{ strain.name }}</a></h1>#}
+{#    <a href="{{ url_for('main.some_strain', strain_index=strain.index) }}">{{ strain.name }}</a>#}
+{#    <ul>#}
+{#        <li>{{ strain.index }}</li>#}
+{#        <li>{{ strain.species }}</li>#}
+{#    </ul>#}
 </div>

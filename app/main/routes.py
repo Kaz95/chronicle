@@ -50,17 +50,6 @@ def strains_list():
                            prev_url=prev_url)
 
 
-# TODO: Change to query string
-# @bp.route('/search/<strain>')
-# @login_required
-# def searched_strains(strain):
-#     page = request.args.get('page', 1, type=int)
-#     strains = Strain.query.filter(Strain.name.like('%' + strain + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
-#     next_url = url_for('main.searched_strains', strain=strain, page=strains.next_num) if strains.has_next else None
-#     prev_url = url_for('main.searched_strains', strain=strain,  page=strains.prev_num) if strains.has_prev else None
-#     return render_template('strains_list.html', title='Search:' + strain, strains_list=strains.items, next_url=next_url, prev_url=prev_url)
-
-
 @bp.route('/strains/<strain_index>')
 @login_required
 def some_strain(strain_index):
@@ -83,7 +72,6 @@ def some_strain(strain_index):
         return render_template('strain.html', title=strain.name, strain=strain)
 
 
-# TODO: Change to query string
 @bp.route('/typeahead')
 def typeahead():
     user_query = request.args.get('q')
