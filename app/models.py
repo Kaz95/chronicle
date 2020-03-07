@@ -14,6 +14,7 @@ tried = db.Table('tried',
                  db.Column('strain_id', db.Integer, db.ForeignKey('strain.id')))
 
 
+# TODO: Clean up these var names eventually. They are ravioli.
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), index=True, unique=True, nullable=False)
@@ -27,12 +28,10 @@ class User(UserMixin, db.Model):
     def has_not_tried(self, page, app):
         return Strain.query.filter(~self.tried.exists()).paginate(page, app.config['STRAINS_PER_PAGE'], False)
 
-    # TODO: Silent error
     def try_strain(self, strain):
         if not self.has_tried(strain):
             self.tried.append(strain)
 
-    # TODO: Silent error
     def untry_strain(self, strain):
         if self.has_tried(strain):
             self.tried.remove(strain)

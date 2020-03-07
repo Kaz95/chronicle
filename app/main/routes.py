@@ -1,8 +1,8 @@
 from flask import render_template, redirect, url_for, flash, request, jsonify, current_app
 from app import db
 from app.models import Strain
-from flask_login import current_user, login_required
 from app.main import bp
+from flask_login import current_user, login_required
 
 
 @bp.route('/')
@@ -12,6 +12,10 @@ def home():
     return render_template('home.html', title='Home')
 
 
+# TODO: DRY
+# TODO: This and the relevant templates assume the only time there wont be strains in strain_list is when no strains
+# TODO: have been tried. It can also occur when user navigates directly to an empty search.
+# TODO: Also consider adding an actual search button.
 @bp.route('/strains')
 @login_required
 def strains_list():
@@ -31,17 +35,16 @@ def strains_list():
         next_url = url_for('main.strains_list', filter='not_tried',  page=strains.next_num) if strains.has_next else None
         prev_url = url_for('main.strains_list', filter='not_tried',  page=strains.prev_num) if strains.has_prev else None
 
+    # TODO: Circumvent 500 error if user navigates directly to search filter with no query.
     elif filter_ == 'search':
         title = 'Search: ' + q
         strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
-
         next_url = url_for('main.strains_list', filter=filter_, q=q, page=strains.next_num) if strains.has_next else None
         prev_url = url_for('main.strains_list', filter=filter_, q=q, page=strains.prev_num) if strains.has_prev else None
 
     # TODO: Consider adding paginate all as a shared class method, or refactoring to be more inline with tried.paginate
     else:
         title = 'Strains'
-        # strains = Strain.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
         strains = Strain.paginate_all(page, current_app)
         next_url = url_for('main.strains_list', page=strains.next_num) if strains.has_next else None
         prev_url = url_for('main.strains_list', page=strains.prev_num) if strains.has_prev else None
@@ -55,9 +58,7 @@ def strains_list():
 def some_strain(strain_index):
     strain = Strain.query.filter_by(index=strain_index).first_or_404()
     action = request.args.get('action')
-    if strain is None:
-        flash(f'Strain: {strain.name} not found')
-        return redirect(url_for('main.home'))
+
     if action:
         if action == 'try':
             current_user.try_strain(strain)
@@ -68,22 +69,21 @@ def some_strain(strain_index):
         db.session.commit()
         return redirect(url_for('main.some_strain', strain_index=strain_index))
     else:
-        strain = Strain.query.filter_by(index=strain_index).first_or_404()
         return render_template('strain.html', title=strain.name, strain=strain)
 
 
 @bp.route('/typeahead')
 def typeahead():
-    user_query = request.args.get('q')
-    q = db.session.query(Strain.name).filter(Strain.name.like(user_query + '%'))
-    count = q.count()
-    if count >= current_app.config['SEARCH_RESULTS']:
-        return jsonify([i for i, in q.limit(current_app.config['SEARCH_RESULTS']).all()])
+    search_string = request.args.get('q')
+    initial_query = db.session.query(Strain.name).filter(Strain.name.like(search_string + '%'))
+    results_count = initial_query.count()
+    if results_count >= current_app.config['SEARCH_RESULTS']:
+        return jsonify([i for i, in initial_query.limit(current_app.config['SEARCH_RESULTS']).all()])
     else:
-        first_query = [i for i, in q.all()]
-        q2 = db.session.query(Strain.name).filter(Strain.name.like('%' + user_query + '%'))
-        results = first_query + [i for i, in q2.limit(current_app.config['SEARCH_RESULTS'] - count).all() if i not in first_query]
-        return jsonify(results)
+        first_query = [i for i, in initial_query.all()]
+        follow_up_query = db.session.query(Strain.name).filter(Strain.name.like('%' + search_string + '%'))
+        agg_results = first_query + [i for i, in follow_up_query.limit(current_app.config['SEARCH_RESULTS'] - results_count).all() if i not in first_query]
+        return jsonify(agg_results)
 
 
 @bp.route('/name_to_index')
