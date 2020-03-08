@@ -1,7 +1,7 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify, current_app
 from app import db
-from app.models import Strain
 from app.main import bp
+from app.models import Strain
+from flask import render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import current_user, login_required
 
 
@@ -22,6 +22,7 @@ def strains_list():
     page = request.args.get('page', 1, type=int)
     filter_ = request.args.get('filter')
     q = request.args.get('q')
+
     if filter_ == 'tried':
         title = 'Tried Strains'
         strains = current_user.tried.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
@@ -63,11 +64,14 @@ def some_strain(strain_index):
         if action == 'try':
             current_user.try_strain(strain)
             flash(f'Strain: {strain.name} has been tried')
+
         if action == 'untry':
             current_user.untry_strain(strain)
             flash(f'Strain: {strain.name} has been un...tried')
+
         db.session.commit()
         return redirect(url_for('main.some_strain', strain_index=strain_index))
+
     else:
         return render_template('strain.html', title=strain.name, strain=strain)
 
@@ -77,8 +81,10 @@ def typeahead():
     search_string = request.args.get('q')
     initial_query = db.session.query(Strain.name).filter(Strain.name.like(search_string + '%'))
     results_count = initial_query.count()
+
     if results_count >= current_app.config['SEARCH_RESULTS']:
         return jsonify([i for i, in initial_query.limit(current_app.config['SEARCH_RESULTS']).all()])
+
     else:
         first_query = [i for i, in initial_query.all()]
         follow_up_query = db.session.query(Strain.name).filter(Strain.name.like('%' + search_string + '%'))
