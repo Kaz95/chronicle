@@ -32,7 +32,6 @@ def create_app(config_class=Config):
 
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:
-            print('pass1')
             auth = None
             if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
                 auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])

@@ -6,6 +6,7 @@ from flask import render_template, redirect, url_for, flash, request, jsonify, c
 from flask_login import current_user, login_required
 
 
+# TODO: Test....?
 @bp.route('/')
 @bp.route('/home')
 @login_required
@@ -13,9 +14,9 @@ def home():
     return render_template('home.html', title='Home')
 
 
-# TODO: This and the relevant templates assume the only time there wont be strains in strain_list is when no strains
-# TODO: have been tried. It can also occur when user navigates directly to an empty search.
+# TODO: RIP out logic
 # TODO: Also consider adding an actual search button.
+# TODO: If add search button, account for empty search.
 @bp.route('/strains')
 @login_required
 def strains_list():
@@ -28,12 +29,12 @@ def strains_list():
         strains = current_user.tried.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
         prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_)
 
-    # TODO: Change has_not_tried to not include the paginate call, then call it here. In line with tried.paginate
     elif filter_ == 'not_tried':
         title = 'Not Tried Strains'
-        strains = current_user.has_not_tried(page, current_app)
+        strains = current_user.has_not_tried().paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
         prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_)
 
+    # TODO: Refactor query into models.py. Something like Strain.search.paginate...
     elif filter_ == 'search':
         if q:
             title = 'Search: ' + q
@@ -52,6 +53,7 @@ def strains_list():
                            prev_url=prev_url)
 
 
+# TODO: RIP logic if any, then integration test
 @bp.route('/strains/<strain_index>')
 @login_required
 def some_strain(strain_index):
@@ -75,6 +77,7 @@ def some_strain(strain_index):
         return render_template('strain.html', title=strain.name, strain=strain)
 
 
+# TODO: RIP logic and test
 @bp.route('/typeahead')
 def typeahead():
     search_string = request.args.get('q')
@@ -91,6 +94,7 @@ def typeahead():
         return jsonify(agg_results)
 
 
+# TODO: RIP logic and test
 @bp.route('/name_to_index')
 def name_to_index():
     strain_name = request.args.get("name")

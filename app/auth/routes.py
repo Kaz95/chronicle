@@ -7,6 +7,7 @@ from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user
 
 
+# TODO: RIP out logic
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -33,6 +34,7 @@ def login():
     return render_template('auth/login.html', title='Sign In', form=form)
 
 
+# TODO: Test
 @bp.route('/logout')
 def logout():
     flash(f'User: {current_user.username} has logged out!')
@@ -40,6 +42,7 @@ def logout():
     return redirect(url_for('main.home'))
 
 
+# TODO: RIP out logic
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:

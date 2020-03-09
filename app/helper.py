@@ -1,6 +1,7 @@
 from flask import url_for
 
 
+# TODO: Test
 def create_prev_next_urls(strains, filt=None, q=None):
     if q:
         next_url = url_for('main.strains_list', filter=filt, q=q,

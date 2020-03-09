@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from hashlib import md5
 
 
+# TODO: Test
 @login.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
@@ -14,6 +15,7 @@ tried = db.Table('tried',
                  db.Column('strain_id', db.Integer, db.ForeignKey('strain.id')))
 
 
+# TODO: Test
 # TODO: Clean up these var names eventually. They are ravioli.
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,8 +27,8 @@ class User(UserMixin, db.Model):
     def has_tried(self, strain):
         return self.tried.filter(tried.c.strain_id == strain.id).count() > 0
 
-    def has_not_tried(self, page, app):
-        return Strain.query.filter(~self.tried.exists()).paginate(page, app.config['STRAINS_PER_PAGE'], False)
+    def has_not_tried(self):
+        return Strain.query.filter(~self.tried.exists())
 
     def try_strain(self, strain):
         if not self.has_tried(strain):
@@ -46,6 +48,7 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
 
 
+# TODO: Test
 class Strain(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     index = db.Column(db.String(25), index=True, unique=True)
@@ -56,7 +59,7 @@ class Strain(db.Model):
 
     @classmethod
     def paginate_all(cls, page, app):
-        return Strain.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
+        return cls.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
 
     def avatar(self, size=128):
         digest = md5(self.name.lower().encode()).hexdigest()
