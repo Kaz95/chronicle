@@ -13,7 +13,6 @@ def home():
     return render_template('home.html', title='Home')
 
 
-# TODO: DRY
 # TODO: This and the relevant templates assume the only time there wont be strains in strain_list is when no strains
 # TODO: have been tried. It can also occur when user navigates directly to an empty search.
 # TODO: Also consider adding an actual search button.
@@ -27,42 +26,27 @@ def strains_list():
     if filter_ == 'tried':
         title = 'Tried Strains'
         strains = current_user.tried.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
-        print(strains)
-
         prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_)
-
-        # next_url = url_for('main.strains_list', filter='tried', page=strains.next_num) if strains.has_next else None
-        # prev_url = url_for('main.strains_list', filter='tried',  page=strains.prev_num) if strains.has_prev else None
 
     # TODO: Change has_not_tried to not include the paginate call, then call it here. In line with tried.paginate
     elif filter_ == 'not_tried':
         title = 'Not Tried Strains'
         strains = current_user.has_not_tried(page, current_app)
-
         prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_)
 
-        # next_url = url_for('main.strains_list', filter='not_tried',  page=strains.next_num) if strains.has_next else None
-        # prev_url = url_for('main.strains_list', filter='not_tried',  page=strains.prev_num) if strains.has_prev else None
-
-    # TODO: Circumvent 500 error if user navigates directly to search filter with no query.
     elif filter_ == 'search':
-        title = 'Search: ' + q
-        strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
-
-        prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_, q=q)
-
-        # next_url = url_for('main.strains_list', filter=filter_, q=q, page=strains.next_num) if strains.has_next else None
-        # prev_url = url_for('main.strains_list', filter=filter_, q=q, page=strains.prev_num) if strains.has_prev else None
+        if q:
+            title = 'Search: ' + q
+            strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
+            prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_, q=q)
+        else:
+            return redirect(url_for('main.strains_list'))
 
     # TODO: Consider adding paginate all as a shared class method, or refactoring to be more inline with tried.paginate
     else:
         title = 'Strains'
         strains = Strain.paginate_all(page, current_app)
-
         prev_url, next_url = helper.create_prev_next_urls(strains)
-
-        # next_url = url_for('main.strains_list', page=strains.next_num) if strains.has_next else None
-        # prev_url = url_for('main.strains_list', page=strains.prev_num) if strains.has_prev else None
 
     return render_template('strains_list.html', title=title, strains_list=strains.items, next_url=next_url,
                            prev_url=prev_url)
@@ -84,6 +68,7 @@ def some_strain(strain_index):
             flash(f'Strain: {strain.name} has been un...tried')
 
         db.session.commit()
+
         return redirect(url_for('main.some_strain', strain_index=strain_index))
 
     else:
