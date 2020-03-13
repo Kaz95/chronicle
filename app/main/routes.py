@@ -34,11 +34,9 @@ def strains_list():
         strains = current_user.has_not_tried().paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
         prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_)
 
-    # TODO: Refactor query into models.py. Something like Strain.search.paginate...
     elif filter_ == 'search':
         if q:
             title = 'Search: ' + q
-            # strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
             strains = Strain.search(q).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
             prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_, q=q)
         else:
@@ -54,7 +52,7 @@ def strains_list():
                            prev_url=prev_url)
 
 
-# TODO: RIP logic if any, then integration test
+# TODO: test w/ client
 @bp.route('/strains/<strain_index>')
 @login_required
 def some_strain(strain_index):
@@ -82,9 +80,13 @@ def some_strain(strain_index):
 @bp.route('/typeahead')
 def typeahead():
     search_string = request.args.get('q')
+    # TODO: Logic
     initial_query = db.session.query(Strain.name).filter(Strain.name.like(search_string + '%'))
+
+    # TODO: Logic...?
     results_count = initial_query.count()
 
+    # TODO: Replace entire block with function that returns pre jsonified results.
     if results_count >= current_app.config['SEARCH_RESULTS']:
         return jsonify([i for i, in initial_query.limit(current_app.config['SEARCH_RESULTS']).all()])
 
@@ -99,5 +101,8 @@ def typeahead():
 @bp.route('/name_to_index')
 def name_to_index():
     strain_name = request.args.get("name")
+
+    # TODO: Logic...?
     strain_index = db.session.query(Strain.index).filter(Strain.name == strain_name).first_or_404()
+
     return redirect(url_for('main.some_strain', strain_index=strain_index[0]))
