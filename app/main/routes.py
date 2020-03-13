@@ -38,7 +38,8 @@ def strains_list():
     elif filter_ == 'search':
         if q:
             title = 'Search: ' + q
-            strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
+            # strains = Strain.query.filter(Strain.name.like('%' + q + '%')).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
+            strains = Strain.search(q).paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
             prev_url, next_url = helper.create_prev_next_urls(strains, filt=filter_, q=q)
         else:
             return redirect(url_for('main.strains_list'))

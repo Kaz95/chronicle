@@ -3,6 +3,7 @@ from config import Config
 from app import create_app, db
 from app.models import User, Strain
 from app.auth import routes
+from app import helper
 
 
 class TestConfig(Config):
@@ -28,20 +29,20 @@ class AuthCase(unittest.TestCase):
         u.hash_password('pass')
         db.session.add(u)
         db.session.commit()
-        self.assertEqual(routes.auth_creds('Kaz', 'pass'), u)
-        self.assertFalse(routes.auth_creds('Not', 'kaz'))
+        self.assertEqual(helper.auth_creds('Kaz', 'pass'), u)
+        self.assertFalse(helper.auth_creds('Not', 'kaz'))
 
     def test_validate_next_page(self):
         valid_url = '/index'
         still_valid_url = 'google.com'
         not_valid_url = 'http://google.com'
-        self.assertTrue(routes.validate_next_page(valid_url))
-        self.assertTrue(routes.validate_next_page(still_valid_url))
-        self.assertFalse(routes.validate_next_page(not_valid_url))
-        self.assertFalse(routes.validate_next_page(None))
+        self.assertTrue(helper.validate_next_page(valid_url))
+        self.assertTrue(helper.validate_next_page(still_valid_url))
+        self.assertFalse(helper.validate_next_page(not_valid_url))
+        self.assertFalse(helper.validate_next_page(None))
 
     def test_create_user(self):
-        u = routes.create_user('Kaz', 'pass')
+        u = helper.create_user('Kaz', 'pass')
         db.session.add(u)
         db.session.commit()
         attempted_user_query = User.query.filter_by(username='Kaz').first()

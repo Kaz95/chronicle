@@ -65,5 +65,9 @@ class Strain(db.Model):
         digest = md5(self.name.lower().encode()).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
+    @classmethod
+    def search(cls, q):
+        return cls.query.filter(cls.name.like('%' + q + '%'))
+
     def __repr__(self):
         return f'<Strain {self.name}>'
