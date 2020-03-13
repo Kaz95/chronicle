@@ -77,5 +77,9 @@ class Strain(db.Model):
     def search(cls, q):
         return cls.query.filter(cls.name.like('%' + q + '%'))
 
+    @classmethod
+    def name_to_index(cls, strain_name):
+        return db.session.query(cls.index).filter(cls.name == strain_name)
+
     def __repr__(self):
         return f'<Strain {self.name}>'

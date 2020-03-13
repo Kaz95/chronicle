@@ -76,39 +76,13 @@ def some_strain(strain_index):
         return render_template('strain.html', title=strain.name, strain=strain)
 
 
-# def get_search_results(*, search_string, initial, count, per_page):
-#     if count >= per_page:
-#         return [i for i, in initial.limit(per_page).all()]
-#     else:
-#         initial_results = [i for i, in initial.all()]
-#         follow_up_query = Strain.follow_up_query(search_string)
-#         agg_results = initial_results + [i for i, in follow_up_query.limit(per_page - count).all()
-#                                          if i not in initial_results]
-#         return agg_results
-
-
-# TODO: RIP logic and test
+# TODO: test w/ client
 @bp.route('/typeahead')
 def typeahead():
     search_string = request.args.get('q')
-    # TODO: Logic
-    # initial_query = db.session.query(Strain.name).filter(Strain.name.like(search_string + '%'))
     initial_query = Strain.initial_query(search_string)
-
     results_count = initial_query.count()
-
-    # TODO: Replace entire block with function that returns pre jsonified results.
-    # if results_count >= current_app.config['SEARCH_RESULTS']:
-    #     return jsonify([i for i, in initial_query.limit(current_app.config['SEARCH_RESULTS']).all()])
-    #
-    # else:
-    #     first_query = [i for i, in initial_query.all()]
-    #     follow_up_query = db.session.query(Strain.name).filter(Strain.name.like('%' + search_string + '%'))
-    #     agg_results = first_query + [i for i, in follow_up_query.limit(current_app.config['SEARCH_RESULTS'] - results_count).all() if i not in first_query]
-    #     return jsonify(agg_results)
-
     return jsonify(helper.get_search_results(count=results_count, initial=initial_query, per_page=current_app.config['SEARCH_RESULTS'], search_string=search_string))
-    # return jsonify(get_search_results(search_string, initial_query, results_count, current_app.config['SEARCH_RESULTS']))
 
 
 # TODO: RIP logic and test
@@ -117,6 +91,7 @@ def name_to_index():
     strain_name = request.args.get("name")
 
     # TODO: Logic...?
-    strain_index = db.session.query(Strain.index).filter(Strain.name == strain_name).first_or_404()
+    # strain_index = db.session.query(Strain.index).filter(Strain.name == strain_name).first_or_404()
+    strain_index = Strain.name_to_index(strain_name).first_or_404()
 
     return redirect(url_for('main.some_strain', strain_index=strain_index[0]))
