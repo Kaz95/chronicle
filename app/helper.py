@@ -1,5 +1,5 @@
 from flask import url_for
-from app.models import User
+from app.models import User, Strain
 from werkzeug.urls import url_parse
 
 
@@ -41,3 +41,14 @@ def create_user(username, password):
     user.username = username
     user.hash_password(password)
     return user
+
+
+def get_search_results(*, search_string, initial, count, per_page):
+    if count >= per_page:
+        return [i for i, in initial.limit(per_page).all()]
+    else:
+        initial_results = [i for i, in initial.all()]
+        follow_up_query = Strain.follow_up_query(search_string)
+        agg_results = initial_results + [i for i, in follow_up_query.limit(per_page - count).all()
+                                         if i not in initial_results]
+        return agg_results

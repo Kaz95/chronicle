@@ -61,6 +61,14 @@ class Strain(db.Model):
     def paginate_all(cls, page, app):
         return cls.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
 
+    @classmethod
+    def initial_query(cls, search_string):
+        return db.session.query(cls.name).filter(cls.name.like(search_string + '%'))
+
+    @classmethod
+    def follow_up_query(cls, search_string):
+        return db.session.query(Strain.name).filter(Strain.name.like('%' + search_string + '%'))
+
     def avatar(self, size=128):
         digest = md5(self.name.lower().encode()).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'

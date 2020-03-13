@@ -14,7 +14,7 @@ def home():
     return render_template('home.html', title='Home')
 
 
-# TODO: RIP out logic
+# TODO: Test w/ client
 # TODO: Also consider adding an actual search button.
 # TODO: If add search button, account for empty search.
 @bp.route('/strains')
@@ -76,25 +76,39 @@ def some_strain(strain_index):
         return render_template('strain.html', title=strain.name, strain=strain)
 
 
+# def get_search_results(*, search_string, initial, count, per_page):
+#     if count >= per_page:
+#         return [i for i, in initial.limit(per_page).all()]
+#     else:
+#         initial_results = [i for i, in initial.all()]
+#         follow_up_query = Strain.follow_up_query(search_string)
+#         agg_results = initial_results + [i for i, in follow_up_query.limit(per_page - count).all()
+#                                          if i not in initial_results]
+#         return agg_results
+
+
 # TODO: RIP logic and test
 @bp.route('/typeahead')
 def typeahead():
     search_string = request.args.get('q')
     # TODO: Logic
-    initial_query = db.session.query(Strain.name).filter(Strain.name.like(search_string + '%'))
+    # initial_query = db.session.query(Strain.name).filter(Strain.name.like(search_string + '%'))
+    initial_query = Strain.initial_query(search_string)
 
-    # TODO: Logic...?
     results_count = initial_query.count()
 
     # TODO: Replace entire block with function that returns pre jsonified results.
-    if results_count >= current_app.config['SEARCH_RESULTS']:
-        return jsonify([i for i, in initial_query.limit(current_app.config['SEARCH_RESULTS']).all()])
+    # if results_count >= current_app.config['SEARCH_RESULTS']:
+    #     return jsonify([i for i, in initial_query.limit(current_app.config['SEARCH_RESULTS']).all()])
+    #
+    # else:
+    #     first_query = [i for i, in initial_query.all()]
+    #     follow_up_query = db.session.query(Strain.name).filter(Strain.name.like('%' + search_string + '%'))
+    #     agg_results = first_query + [i for i, in follow_up_query.limit(current_app.config['SEARCH_RESULTS'] - results_count).all() if i not in first_query]
+    #     return jsonify(agg_results)
 
-    else:
-        first_query = [i for i, in initial_query.all()]
-        follow_up_query = db.session.query(Strain.name).filter(Strain.name.like('%' + search_string + '%'))
-        agg_results = first_query + [i for i, in follow_up_query.limit(current_app.config['SEARCH_RESULTS'] - results_count).all() if i not in first_query]
-        return jsonify(agg_results)
+    return jsonify(helper.get_search_results(count=results_count, initial=initial_query, per_page=current_app.config['SEARCH_RESULTS'], search_string=search_string))
+    # return jsonify(get_search_results(search_string, initial_query, results_count, current_app.config['SEARCH_RESULTS']))
 
 
 # TODO: RIP logic and test
