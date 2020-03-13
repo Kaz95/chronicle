@@ -61,12 +61,13 @@ def logout():
     return redirect(url_for('main.home'))
 
 
-def create_user(username, password, conn):
+def create_user(username, password):
     user = User()
     user.username = username
     user.hash_password(password)
-    conn.session.add(user)
-    conn.session.commit()
+    return user
+    # conn.session.add(user)
+    # conn.session.commit()
 
 
 # TODO: RIP out logic
@@ -83,7 +84,9 @@ def register():
         # user.hash_password(form.password.data)
         # db.session.add(user)
         # db.session.commit()
-        create_user(form.username.data, form.password.data, db)
+        u = create_user(form.username.data, form.password.data)
+        db.session.add(u)
+        db.session.commit()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('auth.login'))
 
