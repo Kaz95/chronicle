@@ -85,13 +85,9 @@ def typeahead():
     return jsonify(helper.get_search_results(count=results_count, initial=initial_query, per_page=current_app.config['SEARCH_RESULTS'], search_string=search_string))
 
 
-# TODO: RIP logic and test
+# TODO: test w/ client
 @bp.route('/name_to_index')
 def name_to_index():
     strain_name = request.args.get("name")
-
-    # TODO: Logic...?
-    # strain_index = db.session.query(Strain.index).filter(Strain.name == strain_name).first_or_404()
     strain_index = Strain.name_to_index(strain_name).first_or_404()
-
     return redirect(url_for('main.some_strain', strain_index=strain_index[0]))
