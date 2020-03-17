@@ -58,10 +58,6 @@ class Strain(db.Model):
     description = db.Column(db.String(1000))
 
     @classmethod
-    def paginate_all(cls, page, app):
-        return cls.query.paginate(page, app.config['STRAINS_PER_PAGE'], False)
-
-    @classmethod
     def initial_query(cls, search_string):
         return db.session.query(cls.name).filter(cls.name.like(search_string + '%'))
 

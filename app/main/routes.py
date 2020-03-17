@@ -42,10 +42,9 @@ def strains_list():
         else:
             return redirect(url_for('main.strains_list'))
 
-    # TODO: Consider adding paginate all as a shared class method, or refactoring to be more inline with tried.paginate
     else:
         title = 'Strains'
-        strains = Strain.paginate_all(page, current_app)
+        strains = Strain.query.paginate(page, current_app.config['STRAINS_PER_PAGE'], False)
         prev_url, next_url = helper.create_prev_next_urls(strains)
 
     return render_template('strains_list.html', title=title, strains_list=strains.items, next_url=next_url,

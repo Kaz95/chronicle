@@ -57,8 +57,10 @@ def get_search_results(*, search_string, initial, count, per_page):
         return agg_results
 
 
-def populate_test_strains(*, strain_dict, db):
+# Tests
+def populate_test_strains(*, strain_dict):
     sample_strains = [i for i in strain_dict.items()][:10]
+    strains_list = []
     for strain in sample_strains:
         index = strain[0]
         name = strain[1]['name']
@@ -66,4 +68,23 @@ def populate_test_strains(*, strain_dict, db):
         species = strain[1]['species']
         description = strain[1]['description']
         temp = Strain(index=index, name=name, leafly=leafly, species=species, description=description)
-        db.session.add(temp)
+        # db.session.add(temp)
+        strains_list.append(temp)
+    return strains_list
+
+
+def populate_test_strain():
+    index = 'test'
+    name = 'Test'
+    leafly = 'leafly/test'
+    species = 'tbd'
+    description = 'ima test'
+    strain = Strain(index=index, name=name, leafly=leafly, species=species, description=description)
+    return strain
+
+
+def create_test_user():
+    user = User()
+    user.username = 'Test'
+    user.hash_password('pass')
+    return user
